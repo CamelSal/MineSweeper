@@ -35,7 +35,7 @@ def nmine(B, i, j,N): #counts the number of mines around a specific spot for a g
     return num
 
 
-class SeaofBTCapp(Tk):
+class SeaofBTCapp(Tk): #makes the opening screen to allow you to select difficulty
     def __init__(self, *args, **kwargs):
         Tk.__init__(self, *args, **kwargs)
         container = Frame(self)
@@ -101,7 +101,7 @@ class MineSweeperH(Frame):
 
 
 
-def reset(self,N,size = 33,fnt = 20):
+def reset(self,N,size = 33,fnt = 20): # reset the whole board destroying all obj to not overload memory
     global F_T, minelox, mineloy, background, turn, flags
     for obj in self.winfo_children():
             obj.destroy()
@@ -118,15 +118,15 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
     flags = mines
 
 
-    def Rclick(event, i, j, f): # will determine location after the move
+    def Rclick(event, i, j, f): # will determine the type of event that will occur after  the click on the specific spot
         global F_T, turn
-        if turn == 0:
+        if turn == 0: # if first turn will create the whole board
             F_T = np.full((N,N),0)
             turn = + 1
             first_turn(i, j, f)
-        elif F_T[i, j] > 0:
+        elif F_T[i, j] > 0: # do nothing space either has a flag or has been revealed
             pass
-        else:
+        else: #revealed the spot and determine next move
             turn = + 1
             turn_event(i, j, f)
 
@@ -134,22 +134,22 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
         global F_T, flags
         F_T[i, j] = 1
         B = background[i, j]
-        if B == -1:
+        if B == -1: #the spot is mine initiate game over
             for k, g in zip(minelox, mineloy):
                 gameover(k, g)
             #F_T = np.full((N, N), 1)
             gm = Label(self, text="Game Over", bg="Black", font=("Verdana", 40), fg="red")
             gm.grid(row=int(N / 2 - 1), column=0, columnspan=N, rowspan=3)
-        elif B == 0:
+        elif B == 0: # revealed all surround frames
             f.config(bg="White", highlightthickness=0.5)
             expand(i, j)
             fx, fy = np.where(F_T == 2)
             flags = mines - len(fx)
             fl.config(text="flags: " + str(flags))
-        else:
+        else: # revealed only the specific frame
             reveal(B, i, j)
 
-    def reveal(B, i, j, c= "white"):
+    def reveal(B, i, j, c= "white"): # change the frame on the spot i,j to reveale B
         frame = (Frame(self, width=size, height=size, bg=c,
                        highlightbackground="Black", highlightthickness=0.5, bd=0))
         frame.grid(row=i + 1, column=j)
@@ -194,7 +194,7 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
                 except:
                     continue
 
-    def drawb(i, j):
+    def drawb(i, j): #determine if there are no mines around to continue expand revealed
         B = background[i, j]
         F_T[i, j] = 1
         if B == 0:
@@ -203,7 +203,7 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
         else:
             reveal(B, i, j, c="white")
 
-    def win(): # checks if win condition has been met if so end game if not keep trying
+    def win(): # checks if win condition has been met if so end game if not keep trying and no more flags allowed
         global F_T
         flagx, flagy = np.where(F_T == 2)
         if np.all(flagx == minelox) and np.all(flagy == mineloy):
@@ -221,24 +221,24 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
         else:
             fl.config(text="Keep Trying")
 
-    def flag_event(event, i, j):
+    def flag_event(event, i, j): #determine if a flag can be place and check if it is that last check win conditions
         global flags
-        if F_T[i, j] == 2:
+        if F_T[i, j] == 2: # removed place flag
             frame_mk(i, j)
             F_T[i, j] = 0
             flags = flags + 1
             fl.config(text="flags: " + str(flags))
-        elif F_T[i, j] == 1:
+        elif F_T[i, j] == 1: #no flag allowed spot revealed
             pass
-        elif flags == 0:
+        elif flags == 0: #no flags left and win condition not met
             pass
-        elif flags == 1:
+        elif flags == 1:# last flag check if condition are met
             flag_pl(i, j)
             win()
-        else:
+        else: # place flag
             flag_pl(i, j)
 
-    def frame_mk(i,j): # sets up the frame for the blcok setting up two mouse events when clicked
+    def frame_mk(i,j): # sets up the frame for the block setting up two mouse events when clicked
         self.update_idletasks()
         frame = (Frame(self, width=size, height=size, bg="grey",
                        highlightbackground="Black", highlightthickness=1, bd=0))
@@ -259,7 +259,7 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
 
 
 
-    def inistt():
+    def inistt(): # inisiates the board 
         global F_T, minelox, mineloy, background, turn, flags
         for i in range(0, N):
             for j in range(0, N):
@@ -269,12 +269,12 @@ def MineBoard(self,N,size = 33,fnt = 20): #sets up the full gui to allow for pla
         fl.config(text="flags: " + str(flags))
         turn = 0
 
-    def color(i):
+    def color(i): # determines the color of the font
         c = ["white","Blue","#196c28","red","#6f20e8","#754138","#40e0d0","#080808","#707577"]
         return c[i]
 
 
-
+    # laids out the area above the screen
     f = Frame(self, width=size * N, height=size, bg="green")
     f.grid(row=0, column=0, columnspan=N)
     txt = Label(self, text="Mineswepper", bg="green", font=("Verdana", 20))
